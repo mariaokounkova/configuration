@@ -1,5 +1,14 @@
 . ~/.bashrc
 
+## Letting us copy the location from one terminal to the other
+C() {
+  echo LOC=$(pwd) > ~/CopyPaste
+}
+P() {
+  source ~/CopyPaste
+  cd $LOC
+}
+
 export PATH=/Users/mokounkova/Library/Python/2.7/bin:$PATH
 export PATH=/Users/mokounkova/Library/Python/3.7/bin:$PATH
 export PATH=/Library/TeX/texbin:$PATH
