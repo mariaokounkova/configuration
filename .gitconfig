@@ -1,0 +1,27 @@
+[color]
+        diff = auto
+        status = auto
+        branch = auto
+        interactive = auto
+        ui = true
+        pager = true
+	ui = true
+[user]
+	name = Maria Okounkova
+	email = m.okounkova@gmail.com
+[push]
+	default = tracking
+[blame]
+	date = short
+[merge]
+	conflictstyle = diff3
+[core]
+	editor = vim
+	pager = less
+[pager]
+	status = true
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
