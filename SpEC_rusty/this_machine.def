@@ -1,0 +1,79 @@
+# -*-makefile-*-
+# vim: syntax=make
+###########################################################################
+#
+# Expanse [expanse.sdsc.edu]
+#
+# Use the modules from Expanse_gcc.env.
+# To load them at login, source this file in $HOME/.modules.
+#
+###########################################################################
+
+#-----------------------
+# CHECK ENVIRONMENT
+#-----------------------
+REQUIRE_ENVFILE = yes
+
+#-----------------------
+# PETSC
+#-----------------------
+# Use local installation of Petsc since expanse does not provide it.
+#
+# Petsc 3.14 doesn't work with BBH initial data (FPE errors, don't know why).
+# But Petsc 3.13 seems to work.
+#
+# Note that we don't need hdf5 support in petsc (and on other machines
+# we often have had clashes between hdf5 and petsc libraries), so we
+# intentionally compile petsc without hdf5.
+#
+# PETSC was compiled by M. Scheel with the following modules (and only
+# the following modules) loaded:
+#  1) cpu/0.15.4   2) gcc/10.2.0   3) openmpi/4.0.4
+#
+# The configure script for PETSC was invoked via:
+# ./configure --prefix=$HOME/software/petsc-3.13.6-gcc --enable-debug=0 \
+# --COPTFLAGS="-O3" --CXXOPTFLAGS="-O3" --FOPTFLAGS="-O3" \
+# --download-fblaslapack
+#
+# Note that the above uses petsc's own version of blas/lapack, which is
+# also used by (and needed by) the rest of the code via -lflapack -lfblas
+# below.
+#
+PETSC_DIR     =  /mnt/home/mokounkova/software/petsc
+PETSC_INCLUDE = -I$(PETSC_DIR)/include
+PETSC_LIB     = -Wl,-rpath,$(PETSC_DIR)/lib -L$(PETSC_DIR)/lib \
+                -lpetsc -lflapack -lfblas
+
+#-----------------------
+# FFTW3
+#-----------------------
+FFTW_INCLUDE = -I$(FFTW3_BASE)/include
+FFTW_LIB     = -L$(FFTW3_BASE)/lib -lfftw3
+
+#-----------------------
+# HDF5
+#-----------------------
+HDF_INCLUDE = -I$(HDF5_BASE)/include
+HDF_LIB     = -Wl,-rpath,$(HDF5_BASE)/lib -L$(HDF5_BASE)/lib -lhdf5 -lz
+
+#-----------------------
+# GSL
+#-----------------------
+GSL_INCLUDE = -I$(GSL_BASE)/include -DHAVE_INLINE -DGSL_C99_INLINE \
+              -DGSL_RANGE_CHECK_OFF
+GSL_LIB     = -Wl,-rpath,$(GSL_BASE)/lib -L$(GSL_BASE)/lib -lgsl -lgslcblas
+
+#--------------------------------
+# Architecture-dependent includes
+#--------------------------------
+ARCH_INCLUDE = $(PETSC_INCLUDE) $(HDF_INCLUDE) $(GSL_INCLUDE) \
+               $(FFTW_INCLUDE)
+
+#----------------------------------
+# ARCHITECTURE-DEPENDENT LIBRARIES
+#----------------------------------
+ARCH_LIB_PARALLEL = $(PETSC_LIB) $(HDF_LIB) $(GSL_LIB) \
+                    $(FFTW_LIB) -ldl
+
+include $(CODE_HOME)/MakefileRules/Machines/Standards/compilers_openmpi.def
+include $(CODE_HOME)/MakefileRules/Machines/Standards/flags_gcc.def
